@@ -1,0 +1,51 @@
+Question 1: 
+SELECT COUNT(DISTINCT Order_id) AS total_orders
+FROM SALES
+WHERE Date = '2023-03-18';
+
+Question 2:
+SELECT COUNT(DISTINCT s.Order_id) AS total_orders
+FROM SALES s
+JOIN CUSTOMERS c ON s.Customer_id = c.Customer_id
+WHERE s.Date = '2023-03-18'
+  AND c.first_name = 'John'
+  AND c.last_name = 'Doe';
+
+Question 3:
+SELECT COUNT(DISTINCT Customer_id) AS total_customers,
+       AVG(total_spend) AS avg_spent_per_customer
+FROM (
+    SELECT Customer_id, SUM(Revenue) AS total_spend
+    FROM SALES
+    WHERE Date >= '2023-01-01' AND Date < '2023-02-01'
+    GROUP BY Customer_id
+) AS customer_spend;
+
+Question 4:
+SELECT i.department, SUM(s.Revenue) AS total_revenue
+FROM SALES s
+JOIN ITEMS i ON s.Item_id = i.Item_id
+WHERE s.Date >= '2022-01-01' AND s.Date < '2023-01-01'
+GROUP BY i.department
+HAVING SUM(s.Revenue) < 600;
+
+Question 5:
+SELECT MAX(order_revenue) AS max_revenue,
+       MIN(order_revenue) AS min_revenue
+FROM (
+    SELECT Order_id, SUM(Revenue) AS order_revenue
+    FROM SALES
+    GROUP BY Order_id
+) AS order_totals;
+
+Question 6:
+WITH MaxOrder AS (
+    SELECT Order_id
+    FROM SALES
+    GROUP BY Order_id
+    ORDER BY SUM(Revenue) DESC
+    LIMIT 1
+)
+SELECT s.Order_id, s.Item_id, s.Quantity, s.Revenue
+FROM SALES s
+JOIN MaxOrder m ON s.Order_id = m.Order_id;
